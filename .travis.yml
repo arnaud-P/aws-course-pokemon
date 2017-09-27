@@ -1,4 +1,8 @@
 language: php
+before_deploy:
+  - zip -r latest *
+  - mkdir -p dpl_cd_upload
+  - mv latest.zip dpl_cd_upload/latest.zip
 deploy:
   provider: codedeploy
   access_key_id: AKIAIN7RNJ425QQMKFXQ
@@ -11,3 +15,4 @@ deploy:
   deployment_group: awsCoursePokemon
   on:
     repo: arnaud-P/aws-course-pokemon
+  region: us-west-1
