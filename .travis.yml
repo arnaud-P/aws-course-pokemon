@@ -1,18 +1,31 @@
 language: php
-before_deploy:
-  - zip -r latest *
-  - mkdir -p dpl_cd_upload
-  - mv latest.zip dpl_cd_upload/latest.zip
+php:
+  - '7.0'
 deploy:
-  provider: codedeploy
+- provider: s3
+  region: eu-west-1
   access_key_id: AKIAIN7RNJ425QQMKFXQ
-  secret_access_key:
-    secure: AhaDs7AHFoQ5M+94/lF3RRbkhbOUrrdjn+pIOVAhTFzCfAdg9/I3qf9L5703gQQ0Lwtq4K9dFzzLpqyZB6AipvFlxZgIOF5+pL7AHNReym5rinpN4COMUcpD9Qfmszr7JcBRt+uYMcwdjzG4IcFAJP9XQ0Z+GsQ9/n6UlSLkwsIA7rhROjY5X6ELdmLmdnUlbi8Q6Kiyyd6SRJBcKJ7ab+dsr8uSQLo93Z8lkSvsjK6UA8D8St31CMOsKSKxlKfqHFIDkdLbS1sT9MytGOW2p2EYAoBpg1eXLPx0n1pkYtnStCQbGoxs8HJhkUJf6I+/SvB8MVpHKgbR2eedCEF3onqYacw+QK6t9oUPdYac1E5gj0qo0MX9BkzBtqtJcYV3u0/3o8AfQx2R1S45meTynK6ud745wXCTe3Y40f5LtnnB4j/cKsTwmewnBtI+zxF4B44dhxf9aeOh0F2HCEZPbSLKtVyxnv7VW4/rCXvJuuWRKSlr0blM+xXGHPsI5U4s4o8T+E1gE/9asUYvEDVkMzsPzLb9Z0WbMNZzKPHkDtLL3uWS3fZxe3bj+4IRgBkOAdgoabTrnEwFwsWDWZCzyIbXZbgn9kKLUFs9IyXucIH9bhNsSmXXyXA85xWIxMaKFtgBjVia/Ef/kwY7ZH+tNRXB+oyIi4eyQEPEn3tX1Yk=
+  secret_access_key: &1
+    secure: PvCyvmg67lFbuInMPttFLfgFIavJS5FDEluG4i4YwX0Xu0/KPfnHRN0UDc37gO/yWrWE5KS3Gs7yVooJ8sMt9SIiAFU+EHwegj8l4z98WTbxjeHl/OAQvALK1sj0vinbneSvNV9DAhqdrXf0QMBTy6nhTXrNrQXGVnBEFtfcxb7Aw9g4FossbMq+07qLrZpUv8qaJ0waweDft61HhfnWSKxY0nH7LDlAxRO8tIKrP7lHI0E0t6fdZ+BK+ePTMIWlRg0abV/xq5AGVMrznFK6/+56wdvMH0v9U+Liv9DJXS7XJ+fOZAo6ErDyZ4VZoxn2OSjE4oWANIn6CSzGq5Ky1XAqm/Fzm1n4T8WWIkyorVU7YLffjTdnQOkJ+pUXd4RSLU2jPwKj1UNPypqj+Qc10f5EH6lxWXuSfUjipB3EXHfmNkPsx1PYvDbrwnzmDca2NeNXuJZoxzEcli2wghkw4PJ7og4KIBZVJ+u4A+taoPPTkV5J0n5h1VB1Zy/tvxMpluR6txJThlEY5dhJZfRnQ8xxxF7A2gg86KUx2P8UuOYH2WiRl27GaXxWIAbsT7EAUOFkE9KH++DGjmEplvy/rcCyJV5N/Cla9HGNDJiGKfc7NuSGr0nW910lyGeuI+E8a7oWwd85ER8NxfOs6amqHbmyBAX8qhrhQc+DRGh/8P8=
+  local_dir: dpl_cd_upload
+  skip_cleanup: true
+  on: &2
+    repo: arnaud-P/aws-course-pokemon
   bucket: aws-bucket-arnaud-penin
-  key: latest.zip
+  upload_dir: latest
+- provider: codedeploy
+  region: eu-west-1
+  access_key_id: AKIAIN7RNJ425QQMKFXQ
+  secret_access_key: *1
+  bucket: aws-bucket-arnaud-penin
+  key: latest/MyApp.zip
   bundle_type: zip
   application: aws-course-pokemon
-  deployment_group: awsCoursePokemon
-  on:
-    repo: arnaud-P/aws-course-pokemon
-  region: us-west-1
+  deployment_group: awsCoursePokemonGrp
+  on: *2
+before_deploy:
+- zip MyApp -r *
+- mkdir -p dpl_cd_upload
+- mv MyApp.zip dpl_cd_upload/MyApp.zip
+script:
+- phpunit --coverage-clover --bootstrap test.php
