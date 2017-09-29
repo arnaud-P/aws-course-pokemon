@@ -6,6 +6,6 @@ $pokemons = json_decode($pokemons, true);
 $pokemon_entries = $pokemons['pokemon_entries'];
 
 foreach($pokemon_entries as $pokemon_entrie) {
-	echo $pokemon_entrie['name'] . '</br>';
+	echo $pokemon_entrie['pokemon_species']['name'] . '</br>';
 }
 
